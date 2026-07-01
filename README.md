@@ -112,19 +112,11 @@ prisma/
 
 ### Install & run
 
-```bash
-# 1. Install dependencies
-bun install        # or: npm install
+npm install        # or: bun install
+npx prisma db push        # or: bun run db:push
+node prisma/seed.js        # or: bun run prisma/seed.js
+npm run dev        # or: bun run dev
 
-# 2. Create the SQLite database & apply the schema
-bun run db:push
-
-# 3. Seed the planets and quiz questions
-bun run prisma/seed.js
-
-# 4. Start the dev server
-bun run dev        # or: npm run dev
-```
 
 Open **http://localhost:3000** and start exploring! 🚀
 
