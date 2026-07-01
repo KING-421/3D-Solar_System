@@ -113,8 +113,14 @@ prisma/
 ### Install & run
 
 npm install        # or: bun install
+
+
 npx prisma db push        # or: bun run db:push
+
+
 node prisma/seed.js        # or: bun run prisma/seed.js
+
+
 npm run dev        # or: bun run dev
 
 
