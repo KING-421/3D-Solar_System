@@ -1,0 +1,99 @@
+// Stellarium - 3D Space Explorer database schema
+// Learn more: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+/// A space explorer (lightweight local user, no password — handle based)
+model Explorer {
+  id          String     @id @default(cuid())
+  handle      String     @unique
+  name        String
+  avatarColor String     @default("#7dd3fc")
+  createdAt   DateTime   @default(now())
+  favorites   Favorite[]
+  scores      QuizScore[]
+  notes       Note[]
+}
+
+/// A celestial body in our 3D solar system
+model Planet {
+  id             String     @id @default(cuid())
+  slug           String     @unique
+  name           String
+  type           String     // star | planet | dwarf | moon
+  color          String     // hex base color
+  emissive       String     @default("#000000")
+  visualRadius   Float      // display radius in 3D scene units
+  orbitRadius    Float      @default(0) // distance from sun in scene units (0 for sun)
+  orbitSpeed     Float      @default(0) // radians/sec
+  rotationSpeed  Float      @default(0.2)
+  ringInner      Float?     // optional ring
+  ringOuter      Float?
+  ringColor      String?
+  // Real-world data
+  diameterKm     String
+  distanceAu     String     // distance from sun in AU (or "—" for sun)
+  dayLength      String
+  yearLength     String
+  temperatureC   String
+  moonCount      Int        @default(0)
+  gravity        String
+  description    String
+  funFact        String
+  composition    String
+  createdAt      DateTime   @default(now())
+  favorites      Favorite[]
+  notes          Note[]
+}
+
+model Favorite {
+  id         String   @id @default(cuid())
+  explorerId String
+  planetId   String
+  createdAt  DateTime @default(now())
+  explorer   Explorer @relation(fields: [explorerId], references: [id], onDelete: Cascade)
+  planet     Planet   @relation(fields: [planetId], references: [id], onDelete: Cascade)
+
+  @@unique([explorerId, planetId])
+}
+
+model QuizQuestion {
+  id            String   @id @default(cuid())
+  planetSlug    String?  // optional: ties question to a planet, else general
+  question      String
+  options       String   // JSON-encoded string array (SQLite has no array type)
+  correctIndex  Int
+  explanation   String
+  createdAt     DateTime @default(now())
+}
+
+model QuizScore {
+  id         String   @id @default(cuid())
+  explorerId String
+  score      Int
+  total      Int
+  createdAt  DateTime @default(now())
+  explorer   Explorer @relation(fields: [explorerId], references: [id], onDelete: Cascade)
+
+  @@index([explorerId])
+}
+
+/// Explorer notes left on a planet (like comments in a star log)
+model Note {
+  id         String   @id @default(cuid())
+  explorerId String
+  planetId   String
+  content    String
+  createdAt  DateTime @default(now())
+  explorer   Explorer @relation(fields: [explorerId], references: [id], onDelete: Cascade)
+  planet     Planet   @relation(fields: [planetId], references: [id], onDelete: Cascade)
+
+  @@index([planetId])
+}
